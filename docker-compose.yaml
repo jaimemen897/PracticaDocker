@@ -1,0 +1,47 @@
+services:
+  mongo-db:
+    container_name: despliegue-mongo
+    image: mongo:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: /run/secrets/db_password
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    ports:
+      - 27018:27017
+    networks:
+      - network-despliegue
+
+  node:
+    container_name: despliegue-node
+    image: node:latest
+    build:
+      context: .
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongo-db
+    networks:
+      - network-despliegue
+
+  nginx:
+    container_name: despliegue-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    depends_on:
+      - node
+    networks:
+      - network-despliegue
+
+networks:
+  network-despliegue:
+
+secrets:
+  db_password:
+    file: password.txt
