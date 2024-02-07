@@ -15,7 +15,7 @@ jobs:
               uses: docker/build-push-action@v4
               with:
                   context: .
-                  push: true
+                  push: false
                   tags: user/app:latest
                   secrets: |
                       MONGO_USER=${{ secrets.MONGO_USER }}
